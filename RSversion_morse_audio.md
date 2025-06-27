@@ -5,8 +5,8 @@ By picking up ambient conversations and transforming them into Morse-code, the s
 
 ## Concept 
 A microphone placed in a public indoor setting (e.g., hallway, cafeteria, or else) listens in. The ambient sound is: 
-1. transcribed into **text** using live speech-to-text software (initial trials used **Vosk**),
-2. Translated into **Morse code** via script,
+1. transcribed into **text** using live speech-to-text software (initial trials used **Vosk**, note: use the Vosk model according to the language that will most possibly be spoken in the environment in which the model is run),
+2. Translated into **Morse code** via script (see below),
 3. Read aloud using **assigned sound cues** for dots and dashes (e.g., high-pitched blip for a dor, lower-pitched buzz for dash. the exact sound does not matter, as long as it is distinguishable and tending towards "unpleasant")
 
 Result: as people talk, the system plays morse-code-echoes of their conversations. The more they talk, the more noise, the more distorted the speech-to-text-info gets. If conversations stop, so does the echo.
@@ -57,3 +57,78 @@ This version is less about information delivery and more about sonic atmosphere:
 
 ---
 ### script trials 
+
+The following script pieces have been my attempts at coding into/for TD, that have eihter errored or not responded at all. 
+
+a) to use Vosk with Python:
+-> the printed result must be saved as txt output
+
+import vosk # Load the Vosk model 
+model = vosk.Model("voskSmallFr") 
+
+recognizer = vosk.KaldiRecognizer(model, 16000) 
+
+audio_file = "speech3.wav" 
+
+    while True: 
+        # Read a chunk of the audio file 
+        data = audio.read(4000) if len(data) == 0: 
+            break 
+        # Recognize the speech in the chunk 
+        recognizer.AcceptWaveform(data) 
+
+result = recognizer.FinalResult() 
+print(result)
+
+
+b) for 'Morse_converter.py' 
+-> is supposed to translate the text from a) into morse and save that result as txt again
+
+def text_to_morse(text):
+    morse = []
+    for char in text.upper():
+        if char in MORSE_CODE_DICT:
+            morse.append(MORSE_CODE_DICT[char])
+        else:
+            continue
+    return ' '.join(morse)
+
+def main():
+    try:
+        with open('output_speech.txt', 'r', encoding='utf-8') as infile:
+            input_text = infile.read()
+    except FileNotFoundError:
+        print("File 'output_speech.txt' not found.")
+        return
+
+    morse_code = text_to_morse(input_text)
+
+    with open('output_morse.txt', 'w', encoding='utf-8') as outfile:
+        outfile.write(morse_code)
+
+    print("Conversion complete. Morse code saved to 'output_morse.txt'.")
+
+
+c) Intended for Touchdesigner as Minimal loader for DAT Execute or Text DAT
+
+def load_morse_to_dat(dat):
+    morse_file_path = project.folder + "/output_morse.txt"
+
+    try:
+        with open(morse_file_path, "r", encoding="utf-8") as file:
+            morse_text = file.read().strip()
+    except Exception as e:
+        morse_text = f"Error: {str(e)}"
+
+    print("Morse code loaded:")
+    print(morse_text)
+
+    if op('morse_data'):
+        op('morse_data').clear()
+        op('morse_data').appendRow([morse_text])
+    else:
+        print("Warning: 'morse_data' DAT not found")
+
+    return
+
+load_morse_to_dat(op('null1'))
