@@ -36,6 +36,7 @@ Please note that all provided files are descriptive. The only included code (if 
 | 'RSversion_morse_visual.md' | Converts Morse from Speach-to-Text-to-Morse into a visual |
 | 'RSversion_greyscale_visual.md' | Builds a grid of greyscae values based on sound intensity over time |
 | 'RSversion_greyscale_interactive.md' | Interactive piece: an image is revealed/hidden depending on volume/frequency |
+| 'RSversion_net_interactive.md | Interactive piece, physical installation that reacts to sound |
 
 --
 
